@@ -23,8 +23,8 @@ public class Tile extends GameBoard {
         return this.position;
     }
 
-    public int getX() { return this.position[0]; }
-    public int getY() { return this.position[1]; }
+    int getX() { return this.position[0]; }
+    int getY() { return this.position[1]; }
 
 
     Tile(int[] position) {

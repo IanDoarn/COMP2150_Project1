@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+
 /**
  * GameBoard Class
  * <p>
@@ -11,9 +12,9 @@ public class GameBoard {
 
     private boolean isSetup = false;
 
-    private final String padding = " ";
-    private final String gridIntersection = "+";
-    private final char gridDelimiter = '-';
+    final String padding = " ";
+    final String gridIntersection = "+";
+    char gridDelimiter = '-';
 
     final char BLANK_PIECE = '_';
     final char WHITE_PIECE = 'W';
@@ -25,9 +26,29 @@ public class GameBoard {
     // These are always 2
     private int countBlackPieces = 2;
     private int countWhitePieces = 2;
-    private int countBlankPieces = MAX_X * MAX_Y + 4;
+    private int countBlankPieces = MAX_X * MAX_Y - 4;
 
-    public boolean getIsSetup() {
+    private Tile[] blankPieces;
+
+    private String winner = "";
+
+    int getCountBlackPieces() {
+        return countBlackPieces;
+    }
+
+    int getCountWhitePieces() {
+        return countWhitePieces;
+    }
+
+    String getWinner() {
+        return this.winner;
+    }
+
+    private void setWinner(String winner) {
+        this.winner = winner;
+    }
+
+    boolean getIsSetup() {
         return isSetup;
     }
 
@@ -36,7 +57,7 @@ public class GameBoard {
         boardTiles = new Tile[MAX_X][MAX_Y];
     }
 
-    public GameBoard(int dimensions) throws Exception {
+    GameBoard(int dimensions) throws Exception {
         // Give GameBoard custom size
         // dimensions -> rows & columns
 
@@ -55,7 +76,6 @@ public class GameBoard {
             throw new Exception(String.format("Invalid board size [%s, %s]", dimensions, dimensions));
         }
     }
-
 
     void setup() {
 
@@ -77,12 +97,27 @@ public class GameBoard {
         isSetup = true;
     }
 
+    private void reset() {
+        isSetup = false;
+    }
 
-    void gameState() {
+    boolean gameState(char currentPiece) {
         // Get the games state
 
         // Count pieces on board
         countPieces();
+
+        if(countBlankPieces == 0) {
+            if (countBlackPieces > countWhitePieces)
+                setWinner(String.valueOf(BLACK_PIECE));
+            else if (countBlackPieces < countWhitePieces)
+                setWinner(String.valueOf(WHITE_PIECE));
+            else if(countBlackPieces == countWhitePieces)
+                setWinner("Tie");
+
+            reset();
+        }
+        return hasMoves(currentPiece);
     }
 
     private void countPieces() {
@@ -105,6 +140,20 @@ public class GameBoard {
         countBlankPieces = cBlank;
     }
 
+    private boolean hasMoves(char piece) {
+        for(Tile[] row : boardTiles) {
+            for(Tile tile : row) {
+                if(tile.getState() == BLANK_PIECE) {
+                    int x = tile.getX();
+                    int y = tile.getY();
+                    if (verifyPlacement(new Tile(new int[] {x, y}, piece), false))
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
     char oppositePiece(char piece) {
         return piece == WHITE_PIECE ? BLACK_PIECE : WHITE_PIECE;
     }
@@ -116,9 +165,9 @@ public class GameBoard {
             System.out.println("You can not remove a piece.");
         }
 
-        if(boardTiles[x][y].getState() == BLANK_PIECE) {
-            Tile newTile = new Tile(new int[] {x, y}, newPiece);
-            while(verifyPlacement(newTile, true)) {
+        if (boardTiles[x][y].getState() == BLANK_PIECE) {
+            Tile newTile = new Tile(new int[]{x, y}, newPiece);
+            while (verifyPlacement(newTile, true)) {
                 boardTiles[x][y] = newTile;
             }
             return boardTiles[x][y] == newTile;
@@ -127,21 +176,21 @@ public class GameBoard {
     }
 
     private boolean verifyPlacement(Tile tile, boolean flip) {
-        if(verifyUpperBounds(tile, flip))
+        if (verifyUpperBounds(tile, flip))
             return true;
-        else if(verifyUpperRightBounds(tile, flip))
+        else if (verifyUpperRightBounds(tile, flip))
             return true;
-        else if(verifyUpperLeftBounds(tile, flip))
+        else if (verifyUpperLeftBounds(tile, flip))
             return true;
-        else if(verifyBottomBounds(tile, flip))
+        else if (verifyBottomBounds(tile, flip))
             return true;
-        else if(verifyBottomRightBounds(tile, flip))
+        else if (verifyBottomRightBounds(tile, flip))
             return true;
-        else if(verifyBottomLeftBounds(tile, flip))
+        else if (verifyBottomLeftBounds(tile, flip))
             return true;
-        else if(verifyLeftBounds(tile, flip))
+        else if (verifyLeftBounds(tile, flip))
             return true;
-        else if(verifyRightBounds(tile, flip))
+        else if (verifyRightBounds(tile, flip))
             return true;
         else
             return false;
@@ -173,7 +222,7 @@ public class GameBoard {
 
     private boolean scanTiles(int x, int y, char piece, String direction, boolean flip) {
         ArrayList<Tile> tArray = new ArrayList<>();
-        tArray.add(new Tile(new int[] {x, y}, piece));
+        tArray.add(new Tile(new int[]{x, y}, piece));
         Tile tile = getTile(direction, boardTiles[x][y]);
 
         while (tile != null) {
@@ -187,9 +236,10 @@ public class GameBoard {
                 tile = getTile(direction, tile);
             }
         }
-        if(tArray.size() >= 3) {
-            if(tArray.get(0).getState() == piece && tArray.get(tArray.size() - 1).getState() == piece) {
-                for (Tile t: tArray) {
+
+        if (tArray.size() >= 3) {
+            if (tArray.get(0).getState() == piece && tArray.get(tArray.size() - 1).getState() == piece) {
+                for (Tile t : tArray) {
                     if (oppositePiece(t.getState()) == piece && flip)
                         t.flip();
                 }
