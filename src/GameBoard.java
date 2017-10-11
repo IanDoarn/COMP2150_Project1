@@ -70,6 +70,8 @@ public class GameBoard {
         return isSetup;
     }
 
+    private void setIsSetup(boolean isSetup) { this.isSetup = isSetup; }
+
     void setup() {
 
         for (int i = 0; i < boardTiles.length; i++) {
@@ -87,11 +89,11 @@ public class GameBoard {
         boardTiles[(MAX_X / 2) - 1][(MAX_Y / 2)].setState(BLACK_PIECE);
         boardTiles[(MAX_X / 2)][(MAX_Y / 2) - 1].setState(BLACK_PIECE);
 
-        isSetup = true;
+        setIsSetup(true);
     }
 
     private void reset() {
-        isSetup = false;
+        setIsSetup(false);
     }
 
     boolean gameState(char currentPiece) {
