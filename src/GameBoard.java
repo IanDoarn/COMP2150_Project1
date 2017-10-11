@@ -15,7 +15,7 @@ public class GameBoard {
     private final String gridIntersection = "+";
     private final char gridDelimiter = '-';
 
-    final char BLANK_PIECE = ' ';
+    final char BLANK_PIECE = '_';
     final char WHITE_PIECE = 'W';
     final char BLACK_PIECE = 'B';
 
@@ -27,9 +27,8 @@ public class GameBoard {
     private int countWhitePieces = 2;
     private int countBlankPieces = MAX_X * MAX_Y + 4;
 
-
-    public int getCountBlankPieces() {
-        return countBlankPieces;
+    public boolean getIsSetup() {
+        return isSetup;
     }
 
     GameBoard() {
@@ -110,113 +109,199 @@ public class GameBoard {
         return piece == WHITE_PIECE ? BLACK_PIECE : WHITE_PIECE;
     }
 
-    public void addPiece(int x, int y, char newPiece) {
+    boolean addPiece(int y, int x, char newPiece) {
 
         // No you can't remove a piece that's cheating
         if (newPiece == BLANK_PIECE) {
             System.out.println("You can not remove a piece.");
         }
+
+        if(boardTiles[x][y].getState() == BLANK_PIECE) {
+            Tile newTile = new Tile(new int[] {x, y}, newPiece);
+            while(verifyPlacement(newTile, true)) {
+                boardTiles[x][y] = newTile;
+            }
+            return boardTiles[x][y] == newTile;
+        }
+        return false;
+    }
+
+    private boolean verifyPlacement(Tile tile, boolean flip) {
+        if(verifyUpperBounds(tile, flip))
+            return true;
+        else if(verifyUpperRightBounds(tile, flip))
+            return true;
+        else if(verifyUpperLeftBounds(tile, flip))
+            return true;
+        else if(verifyBottomBounds(tile, flip))
+            return true;
+        else if(verifyBottomRightBounds(tile, flip))
+            return true;
+        else if(verifyBottomLeftBounds(tile, flip))
+            return true;
+        else if(verifyLeftBounds(tile, flip))
+            return true;
+        else if(verifyRightBounds(tile, flip))
+            return true;
+        else
+            return false;
     }
 
     private Tile getTile(String direction, Tile t) {
-        switch(direction.toLowerCase()) {
-            case "right": return rightTile(t.getX(), t.getY());
-            case "left": return leftTile(t.getX(), t.getY());
-            case "upper": return upperTile(t.getX(), t.getY());
-            case "bottom": return bottomTile(t.getX(), t.getY());
-            case "upperright": return upperRightTile(t.getX(), t.getY());
-            case "bottomright": return bottomRightTile(t.getX(), t.getY());
-            case "upperleft": return upperLeftTile(t.getX(), t.getY());
-            case "bottomleft": return bottomLeftTile(t.getX(), t.getY());
-            default: break;
+        switch (direction.toLowerCase()) {
+            case "right":
+                return rightTile(t.getX(), t.getY());
+            case "left":
+                return leftTile(t.getX(), t.getY());
+            case "upper":
+                return upperTile(t.getX(), t.getY());
+            case "bottom":
+                return bottomTile(t.getX(), t.getY());
+            case "upperright":
+                return upperRightTile(t.getX(), t.getY());
+            case "bottomright":
+                return bottomRightTile(t.getX(), t.getY());
+            case "upperleft":
+                return upperLeftTile(t.getX(), t.getY());
+            case "bottomleft":
+                return bottomLeftTile(t.getX(), t.getY());
+            default:
+                break;
         }
         return null;
     }
 
     private boolean scanTiles(int x, int y, char piece, String direction, boolean flip) {
-        Tile tile = getTile(direction, boardTiles[x][y]);
-        ArrayList tArray = new ArrayList();
+        ArrayList<Tile> tArray = new ArrayList<>();
         tArray.add(new Tile(new int[] {x, y}, piece));
-        do {
-            if(tile.getState() == BLANK_PIECE) {
+        Tile tile = getTile(direction, boardTiles[x][y]);
+
+        while (tile != null) {
+            if (tile.getState() == BLANK_PIECE) {
                 break;
-            }
-            else if(tile.getState() == piece) {
+            } else if (tile.getState() == piece) {
                 tArray.add(tile);
                 break;
-            }
-            else {
+            } else {
                 tArray.add(tile);
                 tile = getTile(direction, tile);
             }
         }
-        while(tile != null);
-
-        return true;
-    }
-
-    boolean verifyRightBounds(Tile tile, boolean flip) {
-        Tile ntile = rightTile(tile.getX(), tile.getY());
-        if(!(ntile == null) && !(ntile.getState() == BLANK_PIECE) && !(ntile.getState() == tile.getState())) {
-            return scanTiles(tile.getX(), tile.getY(), tile.getState(), "right", flip);
+        if(tArray.size() >= 3) {
+            if(tArray.get(0).getState() == piece && tArray.get(tArray.size() - 1).getState() == piece) {
+                for (Tile t: tArray) {
+                    if (oppositePiece(t.getState()) == piece && flip)
+                        t.flip();
+                }
+                return true;
+            }
+            return false;
         }
         return false;
     }
 
+
+    private boolean verifyRightBounds(Tile tile, boolean flip) {
+        Tile ntile = rightTile(tile.getX(), tile.getY());
+        if (!(ntile == null) && !(ntile.getState() == BLANK_PIECE) && !(ntile.getState() == tile.getState()))
+            return scanTiles(tile.getX(), tile.getY(), tile.getState(), "right", flip);
+        return false;
+    }
+
+    private boolean verifyLeftBounds(Tile tile, boolean flip) {
+        Tile ntile = leftTile(tile.getX(), tile.getY());
+        if (!(ntile == null) && !(ntile.getState() == BLANK_PIECE) && !(ntile.getState() == tile.getState()))
+            return scanTiles(tile.getX(), tile.getY(), tile.getState(), "left", flip);
+        return false;
+    }
+
+    private boolean verifyUpperBounds(Tile tile, boolean flip) {
+        Tile ntile = upperTile(tile.getX(), tile.getY());
+        if (!(ntile == null) && !(ntile.getState() == BLANK_PIECE) && !(ntile.getState() == tile.getState()))
+            return scanTiles(tile.getX(), tile.getY(), tile.getState(), "upper", flip);
+        return false;
+    }
+
+    private boolean verifyBottomBounds(Tile tile, boolean flip) {
+        Tile ntile = bottomTile(tile.getX(), tile.getY());
+        if (!(ntile == null) && !(ntile.getState() == BLANK_PIECE) && !(ntile.getState() == tile.getState()))
+            return scanTiles(tile.getX(), tile.getY(), tile.getState(), "bottom", flip);
+        return false;
+    }
+
+    private boolean verifyUpperRightBounds(Tile tile, boolean flip) {
+        Tile ntile = upperRightTile(tile.getX(), tile.getY());
+        if (!(ntile == null) && !(ntile.getState() == BLANK_PIECE) && !(ntile.getState() == tile.getState()))
+            return scanTiles(tile.getX(), tile.getY(), tile.getState(), "upperright", flip);
+        return false;
+    }
+
+    private boolean verifyUpperLeftBounds(Tile tile, boolean flip) {
+        Tile ntile = upperLeftTile(tile.getX(), tile.getY());
+        if (!(ntile == null) && !(ntile.getState() == BLANK_PIECE) && !(ntile.getState() == tile.getState()))
+            return scanTiles(tile.getX(), tile.getY(), tile.getState(), "upperleft", flip);
+        return false;
+    }
+
+    private boolean verifyBottomRightBounds(Tile tile, boolean flip) {
+        Tile ntile = bottomRightTile(tile.getX(), tile.getY());
+        if (!(ntile == null) && !(ntile.getState() == BLANK_PIECE) && !(ntile.getState() == tile.getState()))
+            return scanTiles(tile.getX(), tile.getY(), tile.getState(), "bottomright", flip);
+        return false;
+    }
+
+    private boolean verifyBottomLeftBounds(Tile tile, boolean flip) {
+        Tile ntile = bottomLeftTile(tile.getX(), tile.getY());
+        if (!(ntile == null) && !(ntile.getState() == BLANK_PIECE) && !(ntile.getState() == tile.getState()))
+            return scanTiles(tile.getX(), tile.getY(), tile.getState(), "bottomleft", flip);
+        return false;
+    }
+
     private Tile rightTile(int x, int y) {
-        if(!(y + 1 > MAX_Y - 1)) {
+        if (!(y + 1 > MAX_Y - 1))
             return boardTiles[x][y + 1];
-        }
         return null;
     }
 
-
     private Tile leftTile(int x, int y) {
-        if(!(y - 1 < 0)) {
+        if (!(y - 1 < 0))
             return boardTiles[x][y - 1];
-        }
         return null;
     }
 
     private Tile bottomTile(int x, int y) {
-        if(!(x + 1 > MAX_X - 1)) {
+        if (!(x + 1 > MAX_X - 1))
             return boardTiles[x + 1][y];
-        }
         return null;
     }
 
     private Tile upperTile(int x, int y) {
-        if(!(x - 1 < 0)) {
+        if (!(x - 1 < 0))
             return boardTiles[x - 1][y];
-        }
         return null;
     }
 
     private Tile upperLeftTile(int x, int y) {
-        if(!(x - 1 < 0) && !(y - 1 < 0)) {
+        if (!(x - 1 < 0) && !(y - 1 < 0))
             return boardTiles[x - 1][y - 1];
-        }
         return null;
     }
 
     private Tile upperRightTile(int x, int y) {
-        if(!(x - 1 < 0) && !(y + 1 > MAX_Y - 1)) {
+        if (!(x - 1 < 0) && !(y + 1 > MAX_Y - 1))
             return boardTiles[x - 1][y + 1];
-        }
         return null;
     }
 
     private Tile bottomLeftTile(int x, int y) {
-        if(!(x + 1 > MAX_X - 1) && !(y - 1 < 0)) {
+        if (!(x + 1 > MAX_X - 1) && !(y - 1 < 0))
             return boardTiles[x + 1][y - 1];
-        }
         return null;
     }
 
     private Tile bottomRightTile(int x, int y) {
-        if(!(x + 1 > MAX_X - 1) && !(y + 1 > MAX_Y - 1)) {
+        if (!(x + 1 > MAX_X - 1) && !(y + 1 > MAX_Y - 1))
             return boardTiles[x + 1][y + 1];
-        }
         return null;
     }
 
@@ -227,7 +312,7 @@ public class GameBoard {
         StringBuilder board = new StringBuilder();
 
         if (isSetup) {
-            int rowNumber = 1;
+            int rowNumber = 0;
 
             char[] delimiter = new char[padding.length() + 2];
             Arrays.fill(delimiter, gridDelimiter);
@@ -235,7 +320,7 @@ public class GameBoard {
             board.append(String.format("   %s", padding));
 
             for (int i = 0; i < MAX_X; ++i)
-                board.append(String.format("%s  %s", i + 1, padding));
+                board.append(String.format("%s  %s", i, padding));
 
             board.append("\n");
 

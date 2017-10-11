@@ -32,18 +32,21 @@ public class Tile extends GameBoard {
         state = BLANK_PIECE;
     }
 
-    protected Tile(int[] position, char piece) {
+    Tile(int[] position, char piece) {
         this.position = position;
         state = piece;
     }
 
-    protected void flip() {
-        if (state == BLANK_PIECE)
-            return;
-        if (state == WHITE_PIECE)
-            setState(BLACK_PIECE);
-        if (state == BLACK_PIECE)
-            setState(WHITE_PIECE);
+    void flip() {
+        switch(state) {
+            case WHITE_PIECE:
+                setState(BLACK_PIECE);
+                break;
+            case BLACK_PIECE:
+                setState(WHITE_PIECE);
+                break;
+            default: break;
+        }
     }
 
     @Override
