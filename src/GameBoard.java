@@ -8,12 +8,9 @@ import java.util.Arrays;
  */
 public class GameBoard {
 
-    final String padding = " ";
-    final String gridIntersection = "+";
     final char BLANK_PIECE = '_';
     final char WHITE_PIECE = 'W';
     final char BLACK_PIECE = 'B';
-    char gridDelimiter = '-';
     private Tile[][] boardTiles;
     private boolean isSetup = false;
     private int MAX_X = 8;
@@ -359,8 +356,10 @@ public class GameBoard {
 
         if (isSetup) {
             int rowNumber = 0;
-
+            char gridIntersection = '+';
+            String padding = " ";
             char[] delimiter = new char[padding.length() + 2];
+            char gridDelimiter = '-';
             Arrays.fill(delimiter, gridDelimiter);
 
             board.append(String.format("   %s", padding));
