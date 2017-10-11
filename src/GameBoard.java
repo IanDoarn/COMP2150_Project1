@@ -19,7 +19,8 @@ public class GameBoard {
     // These are always 2
     private int countBlackPieces = 2;
     private int countWhitePieces = 2;
-    private int countBlankPieces = MAX_X * MAX_Y - 4;
+
+    private int countBlankPieces = 0;
 
     private Tile[] blankPieces;
 
@@ -124,11 +125,13 @@ public class GameBoard {
             for (Tile cell : row)
                 switch (cell.getState()) {
                     case BLACK_PIECE:
-                        cBlack++;
+                        cBlack += 1;
                     case WHITE_PIECE:
-                        cWhite++;
+                        cWhite += 1;
+                    case BLANK_PIECE:
+                        cBlank += 1;
                     default:
-                        cBlank++;
+                        break;
                 }
         countBlackPieces = cBlack;
         countWhitePieces = cWhite;
@@ -158,6 +161,7 @@ public class GameBoard {
         // No you can't remove a piece that's cheating
         if (newPiece == BLANK_PIECE) {
             System.out.println("You can not remove a piece.");
+            return false;
         }
 
         if (boardTiles[x][y].getState() == BLANK_PIECE) {
