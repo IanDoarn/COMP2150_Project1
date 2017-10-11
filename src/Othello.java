@@ -8,7 +8,7 @@ public class Othello {
 
     public static void main(String[] args) throws Exception {
         Scanner input = new Scanner(System.in);
-        GameBoard game = new GameBoard(4);
+        GameBoard game = new GameBoard();
         game.setup();
 
         System.out.println(game);

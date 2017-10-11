@@ -243,7 +243,6 @@ public class GameBoard {
         return false;
     }
 
-
     private boolean verifyRightBounds(Tile tile, boolean flip) {
         Tile ntile = rightTile(tile.getX(), tile.getY());
         if (!(ntile == null) && !(ntile.getState() == BLANK_PIECE) && !(ntile.getState() == tile.getState()))
