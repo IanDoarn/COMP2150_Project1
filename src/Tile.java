@@ -8,8 +8,8 @@
  */
 public class Tile extends GameBoard {
 
-    protected char state;
-    protected int[] position;
+    private char state;
+    private int[] position;
 
     void setState(char piece) {
         state = piece;
@@ -19,13 +19,8 @@ public class Tile extends GameBoard {
         return state;
     }
 
-    public int[] getPosition() {
-        return this.position;
-    }
-
     int getX() { return this.position[0]; }
     int getY() { return this.position[1]; }
-
 
     Tile(int[] position) {
         this.position = position;

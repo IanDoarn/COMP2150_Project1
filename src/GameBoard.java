@@ -8,18 +8,14 @@ import java.util.Arrays;
  */
 public class GameBoard {
 
-    private Tile[][] boardTiles;
-
-    private boolean isSetup = false;
-
     final String padding = " ";
     final String gridIntersection = "+";
-    char gridDelimiter = '-';
-
     final char BLANK_PIECE = '_';
     final char WHITE_PIECE = 'W';
     final char BLACK_PIECE = 'B';
-
+    char gridDelimiter = '-';
+    private Tile[][] boardTiles;
+    private boolean isSetup = false;
     private int MAX_X = 8;
     private int MAX_Y = 8;
 
@@ -31,26 +27,6 @@ public class GameBoard {
     private Tile[] blankPieces;
 
     private String winner = "";
-
-    int getCountBlackPieces() {
-        return countBlackPieces;
-    }
-
-    int getCountWhitePieces() {
-        return countWhitePieces;
-    }
-
-    String getWinner() {
-        return this.winner;
-    }
-
-    private void setWinner(String winner) {
-        this.winner = winner;
-    }
-
-    boolean getIsSetup() {
-        return isSetup;
-    }
 
     GameBoard() {
         //Fill board with tiles
@@ -75,6 +51,26 @@ public class GameBoard {
             // Given dimensions are not valid
             throw new Exception(String.format("Invalid board size [%s, %s]", dimensions, dimensions));
         }
+    }
+
+    int getCountBlackPieces() {
+        return countBlackPieces;
+    }
+
+    int getCountWhitePieces() {
+        return countWhitePieces;
+    }
+
+    String getWinner() {
+        return this.winner;
+    }
+
+    private void setWinner(String winner) {
+        this.winner = winner;
+    }
+
+    boolean getIsSetup() {
+        return isSetup;
     }
 
     void setup() {
